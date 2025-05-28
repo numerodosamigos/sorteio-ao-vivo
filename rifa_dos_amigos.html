@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Rifa dos Amigos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #fff;
+      color: #333;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    .timer {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+    .winner {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+    }
+    .history {
+      margin-top: 30px;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>Rifa dos Amigos</h1>
+  <div class="timer" id="timer">Carregando...</div>
+  <div class="winner" id="winner">Próximo número aparecerá aqui</div>
+
+  <div class="history">
+    <h3>Histórico de Sorteios</h3>
+    <ul id="history-list"></ul>
+  </div>
+
+  <script>
+    const timerEl = document.getElementById("timer");
+    const winnerEl = document.getElementById("winner");
+    const historyList = document.getElementById("history-list");
+
+    function getNextHourDate(startHour = 16) {
+      const now = new Date();
+      let next = new Date();
+
+      if (now.getDate() === 28 && now.getHours() < startHour) {
+        next.setHours(startHour, 0, 0, 0);
+      } else {
+        next.setHours(now.getHours() + 1, 0, 0, 0);
+      }
+
+      return next;
+    }
+
+    let nextDrawTime = getNextHourDate();
+
+    function updateTimer() {
+      const now = new Date();
+      const diff = nextDrawTime - now;
+
+      if (diff <= 0) {
+        doDraw();
+        nextDrawTime = getNextHourDate();
+      } else {
+        const h = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+        const m = String(Math.floor((diff / (1000 * 60)) % 60)).padStart(2, '0');
+        const s = String(Math.floor((diff / 1000) % 60)).padStart(2, '0');
+        timerEl.textContent = `Próximo sorteio em: ${h}:${m}:${s}`;
+      }
+    }
+
+    function doDraw() {
+      const number = Math.floor(Math.random() * 100) + 1;
+      const now = new Date();
+      const hour = String(now.getHours()).padStart(2, '0');
+      const minute = String(now.getMinutes()).padStart(2, '0');
+      const entry = document.createElement("li");
+      entry.textContent = `Sorteio das ${hour}:${minute} → Número vencedor: ${number}`;
+      historyList.insertBefore(entry, historyList.firstChild);
+      winnerEl.textContent = `Número vencedor: ${number}`;
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+  </script>
+</body>
+</html>
